@@ -1664,6 +1664,42 @@
             .photo-stack {
                 min-height: auto;
             }
+
+            #why .photo-stack,
+            #why .photo-placeholder,
+            #why .photo-placeholder img {
+                min-height: 0;
+            }
+
+            #why .photo-placeholder.has-image {
+                aspect-ratio: 4 / 5;
+                max-width: 420px;
+                margin: 0 auto;
+                background: #ffffff;
+            }
+
+            #why .photo-placeholder img {
+                height: 100%;
+                object-fit: contain;
+                object-position: top center;
+                border-radius: 16px;
+                background: #ffffff;
+            }
+
+            .program-media.media-placeholder.image {
+                aspect-ratio: auto;
+                min-height: 0;
+                padding: 0.75rem;
+                background: rgba(12, 17, 22, 0.92);
+            }
+
+            .program-media img {
+                height: auto;
+                max-height: 260px;
+                object-fit: contain;
+                object-position: center top;
+                border-radius: 12px;
+            }
         }
 
         @media (max-width: 900px) {
