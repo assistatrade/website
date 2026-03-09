@@ -1,0 +1,2159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Assist-A-Trade is a fully customizable trading system, combining Tinder-style trade opportunity popups, risk-controlled execution, and Finviz/IBKR workflows in one intuitive platform.">
+    <meta name="keywords" content="trading command center, play pass trading, IBKR execution, Finviz alerts, trading journal, risk engine, performance hub, Assist-A-Trade">
+    <title>Assist-A-Trade | Trading Command Center</title>
+    <link rel="icon" type="image/png" href="assets/logo_title.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=Work+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-blue: #1F4E79;
+            --primary-cyan: #5B89B6;
+            --primary-purple: #3C3C7A;
+            --accent-pink: #8A5A5A;
+            --accent-magenta: #6E5E8A;
+            --accent-orange: #8A6A4A;
+            --accent-yellow: #A38B4A;
+            --dark-bg: #0C1116;
+            --darker-bg: #080C10;
+            --card-bg: rgba(15, 20, 28, 0.9);
+            --card-border: rgba(120, 140, 170, 0.2);
+            --text-primary: #FFFFFF;
+            --text-secondary: #C6D0DC;
+            --text-muted: #8C9AA8;
+            --glow-cyan: rgba(91, 137, 182, 0.2);
+            --glow-pink: rgba(138, 90, 90, 0.2);
+            --glow-purple: rgba(60, 60, 122, 0.2);
+            --font-heading: 'Sora', sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Work Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--dark-bg);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Ambient Background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background:
+                radial-gradient(ellipse 80% 50% at 20% 35%, rgba(91, 137, 182, 0.18), transparent),
+                radial-gradient(ellipse 60% 40% at 80% 60%, rgba(60, 60, 122, 0.16), transparent),
+                radial-gradient(ellipse 50% 30% at 50% 85%, rgba(138, 90, 90, 0.12), transparent);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        /* Topographic Line Overlay */
+        .geo-grid {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image:
+                repeating-linear-gradient(0deg, rgba(120, 140, 170, 0.06) 0px, rgba(120, 140, 170, 0.06) 1px, transparent 1px, transparent 26px),
+                repeating-linear-gradient(90deg, rgba(120, 140, 170, 0.04) 0px, rgba(120, 140, 170, 0.04) 1px, transparent 1px, transparent 32px);
+            background-size: 100% 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(10, 14, 18, 0.9);
+            backdrop-filter: blur(20px);
+            z-index: 1000;
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--card-border);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2.5rem;
+            list-style: none;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: color 0.3s ease;
+            letter-spacing: 0.01em;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary-cyan);
+            text-shadow: none;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary-cyan);
+            transition: width 0.3s ease;
+            box-shadow: none;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .nav-links a {
+            position: relative;
+        }
+
+        .nav-icons {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .nav-icon {
+            width: 24px;
+            height: 24px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .nav-icon:hover {
+            color: var(--text-primary);
+        }
+
+        .btn-get-started {
+            background: var(--primary-blue);
+            color: #ffffff;
+            padding: 0.6rem 1.5rem;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-decoration: none;
+            border: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.35);
+        }
+
+        .btn-get-started:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 14px 28px rgba(0, 0, 0, 0.4);
+        }
+
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 8rem 2rem 4rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .rolling-bg {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .rolling-slideshow {
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+        }
+
+        .rolling-slideshow .slide {
+            position: absolute;
+            inset: 0;
+            background-size: cover;
+            background-position: center;
+            opacity: 0;
+            transition: opacity 1.5s ease-in-out;
+        }
+
+        .rolling-slideshow .slide.active {
+            opacity: 1;
+        }
+
+        .rolling-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(
+                180deg,
+                rgba(8, 12, 16, 0.75) 0%,
+                rgba(8, 12, 16, 0.55) 40%,
+                rgba(8, 12, 16, 0.7) 70%,
+                rgba(8, 12, 16, 0.9) 100%
+            );
+            z-index: 1;
+        }
+
+
+        .hero-content {
+            z-index: 2;
+            max-width: 820px;
+        }
+
+        .hero-logo {
+            width: clamp(240px, 18vw, 360px);
+            height: clamp(240px, 18vw, 360px);
+            margin: 0 auto 1.25rem;
+            animation: fadeIn 1s ease-out;
+            filter: none;
+        }
+
+        .hero-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .hero-subtitle {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            letter-spacing: 0.25em;
+            text-transform: uppercase;
+            margin-bottom: 1.5rem;
+            animation: fadeIn 1s ease-out 0.2s both;
+        }
+
+        .hero h1 {
+            font-family: var(--font-heading);
+            font-size: clamp(2.8rem, 6vw, 4.8rem);
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            line-height: 1.1;
+            letter-spacing: -0.02em;
+            animation: fadeIn 1s ease-out 0.3s both;
+            color: var(--text-primary);
+        }
+
+        .hero .tagline {
+            font-size: clamp(1.1rem, 2vw, 1.5rem);
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            font-weight: 400;
+            max-width: 550px;
+            margin-left: auto;
+            margin-right: auto;
+            animation: fadeIn 1s ease-out 0.4s both;
+        }
+
+        .hero-support {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            max-width: 680px;
+            margin: 0 auto 2.5rem;
+            line-height: 1.7;
+            animation: fadeIn 1s ease-out 0.45s both;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1.2rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Section Styles */
+        section {
+            max-width: 100%;
+            margin: 0 auto;
+            padding: 0;
+        }
+
+        .section-wrap {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 6rem 2rem;
+        }
+
+        .split-section {
+            background: #ffffff;
+            color: #1B2A2F;
+            --text-primary: #1B2A2F;
+            --text-secondary: #3B4C52;
+            --text-muted: #6B7A80;
+            position: relative;
+            z-index: 1;
+            overflow: hidden;
+        }
+
+        .split-section .section-wrap {
+            background: #ffffff;
+            position: relative;
+            z-index: 1;
+        }
+
+        .split-section::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: #ffffff;
+            z-index: 0;
+        }
+
+        .split-section::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 200vw;
+            left: -50vw;
+            background: #ffffff;
+            z-index: 0;
+        }
+
+        .split-section .section-label,
+        .split-section .section-title,
+        .split-section .section-description {
+            color: #1B2A2F;
+        }
+
+        .split-section .section-label {
+            background: rgba(27, 42, 47, 0.04);
+            border: 1px solid rgba(27, 42, 47, 0.1);
+        }
+
+        .split-section .vision-content h3 {
+            color: #1B2A2F;
+        }
+
+        .split-section .stat-number {
+            color: #1B2A2F;
+        }
+
+        .split-section .stat-item {
+            background: #F5F6F8;
+            border: 1px solid rgba(27, 42, 47, 0.12);
+        }
+
+        .split-section .media-placeholder {
+            background: #F5F6F8;
+            border: 2px dashed rgba(27, 42, 47, 0.2);
+        }
+
+        .split-section .media-placeholder::before {
+            background:
+                linear-gradient(rgba(27, 42, 47, 0.04) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(27, 42, 47, 0.04) 1px, transparent 1px);
+        }
+
+        .split-section .blog-card,
+        .split-section .contact-form {
+            background: #F7F8FA;
+            border: 1px solid rgba(27, 42, 47, 0.12);
+            box-shadow: none;
+        }
+
+        .split-section .contact-icon {
+            background: #EEF2F5;
+            border: 1px solid rgba(27, 42, 47, 0.12);
+            color: #1B2A2F;
+        }
+
+        .split-section .form-group input,
+        .split-section .form-group textarea,
+        .split-section .form-group select {
+            background: #FFFFFF;
+            border: 1px solid rgba(27, 42, 47, 0.2);
+            color: #1B2A2F;
+        }
+
+        .split-section .form-group input:focus,
+        .split-section .form-group textarea:focus,
+        .split-section .form-group select:focus {
+            border-color: rgba(27, 42, 47, 0.4);
+            box-shadow: 0 0 0 3px rgba(27, 42, 47, 0.08);
+        }
+
+        .split-section .btn-primary {
+            background: #1F4E79;
+            color: #ffffff;
+            box-shadow: none;
+        }
+
+        .split-grid {
+            display: grid;
+            grid-template-columns: 1.1fr 0.9fr;
+            gap: 3rem;
+            align-items: center;
+        }
+
+        #why .split-grid {
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .photo-stack {
+            position: relative;
+            min-height: 380px;
+        }
+
+        #why .photo-stack,
+        #why .photo-placeholder,
+        #why .photo-placeholder img {
+            min-height: 380px;
+        }
+
+        .photo-placeholder {
+            background: #F2F4F6;
+            border: 1px dashed rgba(27, 42, 47, 0.2);
+            border-radius: 18px;
+            min-height: 320px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #6B7A80;
+            text-align: center;
+            padding: 2rem;
+            overflow: hidden;
+        }
+
+        .photo-placeholder.has-image {
+            padding: 0;
+        }
+
+        .photo-placeholder img {
+            width: 100%;
+            height: 100%;
+            min-height: 320px;
+            object-fit: cover;
+            border-radius: 16px;
+            display: block;
+        }
+
+
+        .photo-bg-section {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .photo-bg {
+            position: absolute;
+            inset: 0;
+            background: #141b22;
+            background-size: cover;
+            background-position: center;
+            opacity: 0.35;
+        }
+
+        .photo-bg::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(
+                180deg,
+                rgba(8, 12, 16, 0.75) 0%,
+                rgba(8, 12, 16, 0.85) 60%,
+                rgba(8, 12, 16, 0.95) 100%
+            );
+        }
+
+        .photo-bg-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .band {
+            background: var(--dark-bg);
+        }
+
+        .band-alt {
+            background:
+                linear-gradient(120deg, rgba(31, 78, 121, 0.2), rgba(12, 17, 22, 0.9)),
+                radial-gradient(ellipse 70% 50% at 10% 20%, rgba(91, 137, 182, 0.2), transparent),
+                radial-gradient(ellipse 60% 40% at 90% 80%, rgba(138, 90, 90, 0.16), transparent);
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .section-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            letter-spacing: 0.25em;
+            text-transform: uppercase;
+            margin-bottom: 1rem;
+            font-weight: 600;
+            text-shadow: none;
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 30px;
+        }
+
+        .section-title {
+            font-family: var(--font-heading);
+            font-size: clamp(2rem, 4vw, 3.5rem);
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            letter-spacing: -0.02em;
+            color: var(--text-primary);
+        }
+
+        .section-description {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            max-width: 700px;
+            line-height: 1.8;
+        }
+
+        #how .section-label,
+        #how .section-title,
+        #how .section-description,
+        #involved .section-label,
+        #involved .section-title,
+        #involved .section-description {
+            text-align: center;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        #how .section-description,
+        #involved .section-description {
+            max-width: 760px;
+        }
+
+        /* How It Works Section - Light gradient */
+        #how {
+            background: none;
+            position: relative;
+        }
+
+        #how .section-label,
+        #how .section-title,
+        #how .section-description {
+            position: relative;
+            z-index: 1;
+        }
+
+        .solutions-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 2rem;
+            margin-top: 4rem;
+        }
+
+        .pipeline-flow {
+            margin: 3rem auto 0;
+            max-width: 1100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .flow-step {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 999px;
+            padding: 0.85rem 1.4rem;
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: var(--text-primary);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            min-width: 190px;
+        }
+
+        .flow-arrow {
+            width: 28px;
+            height: 28px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-cyan);
+            opacity: 0.85;
+        }
+
+        .flow-arrow::after {
+            content: '→';
+            font-size: 1.3rem;
+        }
+
+        .solution-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 2.5rem;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .solution-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--primary-cyan);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .solution-card::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(91, 137, 182, 0.08) 0%, transparent 50%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+
+        .solution-card:hover {
+            border-color: var(--primary-cyan);
+            transform: translateY(-8px);
+            box-shadow: 0 18px 40px rgba(0, 0, 0, 0.25);
+        }
+
+        .solution-card:hover::before,
+        .solution-card:hover::after {
+            opacity: 1;
+        }
+
+        .solution-icon {
+            width: 56px;
+            height: 56px;
+            margin-bottom: 1.5rem;
+            background: rgba(91, 137, 182, 0.18);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: none;
+            color: var(--primary-cyan);
+        }
+
+        .solution-card h3 {
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .solution-card p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.8;
+        }
+
+        /* Get Involved Section */
+        #involved {
+            padding-top: 8rem;
+        }
+
+        #involved .section-title,
+        #involved .section-description {
+            color: #ffffff;
+        }
+
+        .involvement-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2rem;
+            margin-top: 4rem;
+        }
+
+        .involvement-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 2rem;
+            transition: all 0.4s ease;
+        }
+
+        .involvement-card:hover {
+            border-color: var(--primary-cyan);
+            transform: translateY(-8px);
+            box-shadow: 0 18px 40px rgba(0, 0, 0, 0.25);
+        }
+
+        .involvement-card h3 {
+            font-size: 1.1rem;
+            margin-bottom: 0.75rem;
+            font-weight: 600;
+            color: #ffffff;
+        }
+
+        .involvement-card p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.7;
+        }
+
+        /* Media Placeholder Styles */
+        .media-placeholder {
+            position: relative;
+            background:
+                linear-gradient(135deg, rgba(91, 137, 182, 0.05), rgba(60, 60, 122, 0.04)),
+                radial-gradient(ellipse at center, rgba(120, 140, 170, 0.03), transparent 70%);
+            border: 2px dashed rgba(120, 140, 170, 0.25);
+            border-radius: 16px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.4s ease;
+        }
+
+        .media-placeholder::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+                linear-gradient(rgba(120, 140, 170, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(120, 140, 170, 0.02) 1px, transparent 1px);
+            background-size: 30px 30px;
+            pointer-events: none;
+        }
+
+        .media-placeholder:hover {
+            border-color: rgba(120, 140, 170, 0.45);
+            box-shadow: none;
+        }
+
+        .media-placeholder.image {
+            aspect-ratio: 16/9;
+        }
+
+        .media-placeholder.vision-media {
+            aspect-ratio: auto;
+        }
+
+        .media-placeholder.video {
+            aspect-ratio: 16/9;
+        }
+
+        .media-placeholder.square {
+            aspect-ratio: 1;
+        }
+
+        .media-placeholder.portrait {
+            aspect-ratio: 3/4;
+        }
+
+        .placeholder-content {
+            text-align: center;
+            color: var(--text-secondary);
+            padding: 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .placeholder-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.7;
+            filter: none;
+        }
+
+        .placeholder-text {
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-secondary);
+        }
+
+        .placeholder-size {
+            font-size: 0.75rem;
+            opacity: 0.7;
+            color: var(--text-muted);
+        }
+
+        /* Actual media in placeholders */
+        .media-placeholder img,
+        .media-placeholder video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .media-placeholder.vision-media img {
+            height: auto;
+            object-fit: contain;
+            display: block;
+        }
+
+        /* Vision Section */
+        #vision {
+            background: none;
+            position: relative;
+        }
+
+        #vision::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--primary-cyan), transparent);
+        }
+
+        .vision-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .vision-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+            margin-top: 4rem;
+        }
+
+        .vision-content h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            color: #ffffff;
+        }
+
+        .vision-content p {
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+            line-height: 1.8;
+        }
+
+        .vision-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .stat-item {
+            text-align: left;
+        }
+
+        .stat-number {
+            font-family: var(--font-heading);
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #ffffff;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-top: 0.25rem;
+        }
+
+        .stat-item {
+            padding: 1.5rem;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .stat-item:hover {
+            border-color: var(--primary-cyan);
+            box-shadow: 0 10px 24px rgba(0, 0, 0, 0.25);
+        }
+
+        /* Programs Section */
+        #programs {
+            padding-top: 8rem;
+            background: #ffffff;
+            position: relative;
+        }
+
+        #programs .photo-bg {
+            display: none;
+        }
+
+        #programs .section-label {
+            color: #3a4c63;
+            background: rgba(31, 78, 121, 0.08);
+            border-color: rgba(31, 78, 121, 0.18);
+        }
+
+        #programs .section-title {
+            color: #111827;
+        }
+
+        #programs .section-description,
+        #programs .section-description p,
+        #programs .section-description li {
+            color: #1f2937;
+        }
+
+        #programs .section-description strong {
+            color: #111827;
+        }
+
+        .programs-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            margin-top: 4rem;
+        }
+
+        .program-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: all 0.4s ease;
+            position: relative;
+        }
+
+        .program-card::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(91, 137, 182, 0.05), transparent 50%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+
+        .program-card:hover {
+            border-color: var(--primary-cyan);
+            transform: translateY(-8px);
+            box-shadow: 0 18px 40px rgba(0, 0, 0, 0.25);
+        }
+
+        .program-card:hover::after {
+            opacity: 1;
+        }
+
+        .program-media {
+            height: 200px;
+            overflow: hidden;
+        }
+
+        .program-content {
+            padding: 1.5rem;
+        }
+
+        .program-tag {
+            display: inline-block;
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            background: rgba(255, 255, 255, 0.06);
+            padding: 0.3rem 0.9rem;
+            border-radius: 20px;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            text-shadow: none;
+        }
+
+        .program-card h3 {
+            font-size: 1.15rem;
+            margin-bottom: 0.75rem;
+            font-weight: 600;
+            color: #ffffff;
+        }
+
+        .program-card p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            line-height: 1.7;
+        }
+
+        /* Featured Media Section */
+        #featured {
+            background: none;
+            position: relative;
+        }
+
+        #featured::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--primary-cyan), transparent);
+        }
+
+        .featured-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .featured-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            grid-template-rows: auto auto;
+            gap: 2rem;
+            margin-top: 4rem;
+        }
+
+        .featured-main {
+            grid-row: span 2;
+        }
+
+        .featured-item {
+            position: relative;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .featured-caption {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 1.5rem;
+            background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
+        }
+
+        .featured-caption h4 {
+            font-size: 1.1rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .featured-caption p {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        /* Team Section */
+        #team {
+            padding-top: 8rem;
+        }
+
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-top: 4rem;
+        }
+
+        .team-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: all 0.4s ease;
+            position: relative;
+        }
+
+        .team-card:hover {
+            border-color: var(--primary-cyan);
+            transform: translateY(-8px);
+            box-shadow: 0 18px 40px rgba(0, 0, 0, 0.25);
+        }
+
+        .team-photo {
+            height: 280px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .team-photo.media-placeholder.portrait {
+            margin: 0 auto;
+        }
+
+        .team-photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center center;
+            display: block;
+        }
+
+        .team-icon {
+            height: 280px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--card-border);
+            border-radius: 16px 16px 0 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+        }
+
+        .team-icon svg {
+            width: 56px;
+            height: 56px;
+        }
+
+        .team-info {
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .team-info h3 {
+            font-size: 1.1rem;
+            margin-bottom: 0.25rem;
+            color: var(--text-primary);
+        }
+
+        .team-info .role {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            margin-bottom: 1rem;
+            text-shadow: none;
+        }
+
+        .team-info p {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            line-height: 1.6;
+        }
+
+        .blog-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .blog-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            margin-top: 4rem;
+        }
+
+        .blog-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: all 0.4s ease;
+        }
+
+        .blog-card:hover {
+            border-color: var(--primary-cyan);
+            transform: translateY(-8px);
+            box-shadow: 0 18px 40px rgba(0, 0, 0, 0.25);
+        }
+
+        .blog-image {
+            height: 200px;
+            overflow: hidden;
+            background: #ffffff;
+        }
+
+        .blog-image.media-placeholder.image {
+            aspect-ratio: auto;
+        }
+
+        .blog-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            padding: 0;
+            background: #ffffff;
+            display: block;
+        }
+
+        .blog-image.zoom-out img {
+            object-fit: contain;
+            padding: 36px;
+            background: #ffffff;
+        }
+
+        .blog-content {
+            padding: 1.5rem;
+        }
+
+        .blog-date {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-bottom: 0.75rem;
+        }
+
+        .blog-card h3 {
+            font-size: 1rem;
+            margin-bottom: 0.75rem;
+            font-weight: 600;
+            line-height: 1.4;
+        }
+
+        .blog-card p {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            line-height: 1.6;
+        }
+
+        /* CTA Section */
+        #cta {
+            text-align: center;
+            padding: 8rem 2rem;
+            position: relative;
+            background:
+                radial-gradient(ellipse 80% 50% at 50% 50%, rgba(91, 137, 182, 0.08), transparent),
+                radial-gradient(ellipse 60% 40% at 30% 70%, rgba(138, 90, 90, 0.06), transparent),
+                radial-gradient(ellipse 60% 40% at 70% 30%, rgba(60, 60, 122, 0.06), transparent);
+        }
+
+        .cta-content {
+            max-width: 700px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .cta-content h2 {
+            font-family: var(--font-heading);
+            font-size: clamp(2rem, 4vw, 3.5rem);
+            margin-bottom: 1.5rem;
+            color: var(--text-primary);
+        }
+
+        .cta-content p {
+            color: var(--text-secondary);
+            font-size: 1.15rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 1.5rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-primary {
+            background: var(--primary-blue);
+            color: #ffffff;
+            padding: 1rem 2.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border: none;
+            box-shadow: 0 12px 24px rgba(31, 94, 74, 0.18);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 14px 28px rgba(31, 94, 74, 0.22);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--text-secondary);
+            padding: 1rem 2.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: none;
+            transform: translateY(-3px);
+        }
+
+        /* Contact Section */
+        #contact {
+            background: none;
+            position: relative;
+        }
+
+        #contact::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--primary-cyan), transparent);
+        }
+
+        .contact-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .contact-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 4rem;
+            margin-top: 4rem;
+        }
+
+        .contact-info h3 {
+            font-size: 1.25rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .contact-icon {
+            width: 44px;
+            height: 44px;
+            background: rgba(91, 137, 182, 0.12);
+            border: 1px solid rgba(120, 140, 170, 0.2);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            color: var(--text-secondary);
+            box-shadow: none;
+        }
+
+        .contact-item p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .contact-item a {
+            color: var(--primary-cyan);
+            text-decoration: none;
+        }
+
+        .contact-item a:hover {
+            text-decoration: underline;
+        }
+
+        .contact-form {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 2.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .contact-form::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--primary-cyan);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            background: var(--darker-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 6px;
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 0.95rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--primary-cyan);
+            box-shadow: 0 0 16px rgba(0, 0, 0, 0.25);
+        }
+
+        .form-group textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        /* Footer */
+        footer {
+            background:
+                radial-gradient(ellipse 80% 30% at 50% 100%, rgba(91, 137, 182, 0.05), transparent),
+                var(--darker-bg);
+            border-top: 1px solid var(--card-border);
+            padding: 4rem 2rem 2rem;
+            position: relative;
+        }
+
+        footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--primary-cyan), transparent);
+        }
+
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 2fr repeat(3, 1fr);
+            gap: 3rem;
+            margin-bottom: 3rem;
+        }
+
+        .footer-brand {
+            max-width: 300px;
+        }
+
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .footer-logo img {
+            height: 36px;
+            width: auto;
+        }
+
+        .footer-logo span {
+            font-family: var(--font-heading);
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .footer-logo img {
+            filter: none;
+        }
+
+        .footer-brand p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            line-height: 1.7;
+        }
+
+        .footer-section h4 {
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            text-shadow: none;
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section li {
+            margin-bottom: 0.75rem;
+        }
+
+        .footer-section a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .footer-section a:hover {
+            color: var(--text-primary);
+            text-shadow: none;
+        }
+
+        .footer-bottom {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding-top: 2rem;
+            border-top: 1px solid var(--card-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .footer-bottom p {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .social-link {
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-cyan);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .social-link:hover {
+            border-color: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: none;
+            transform: translateY(-3px);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .hero-inner,
+            .vision-grid,
+            .contact-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .split-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .programs-grid,
+            .blog-grid,
+            .involvement-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .solutions-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .featured-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .featured-main {
+                grid-row: auto;
+            }
+
+            .footer-content {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .menu-toggle {
+                display: block;
+            }
+
+            .nav-links {
+                position: fixed;
+                top: 70px;
+                left: -100%;
+                flex-direction: column;
+                background: rgba(10, 14, 18, 0.98);
+                width: 100%;
+                padding: 2rem;
+                gap: 1.5rem;
+                transition: left 0.3s ease;
+                border-bottom: 1px solid var(--card-border);
+            }
+
+            .nav-links.active {
+                left: 0;
+            }
+
+            .nav-icons,
+            .btn-get-started {
+                display: none;
+            }
+
+            .solutions-grid,
+            .programs-grid,
+            .blog-grid,
+            .involvement-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .footer-content {
+                grid-template-columns: 1fr;
+            }
+
+            .footer-bottom {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .photo-stack {
+                min-height: auto;
+            }
+        }
+
+        @media (max-width: 900px) {
+            .pipeline-flow {
+                flex-direction: column;
+                gap: 0.75rem;
+            }
+
+            .flow-arrow::after {
+                content: '↓';
+            }
+        }
+
+        /* Utility Classes */
+        .text-gradient {
+            background: linear-gradient(135deg, var(--primary-cyan), var(--primary-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.6s ease;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <!-- Global Geometric Grid -->
+    <div class="geo-grid"></div>
+
+    <!-- Navigation -->
+    <nav>
+        <div class="nav-container">
+            <ul class="nav-links" id="navLinks">
+                <li><a href="#why">Why Assist-A-Trade</a></li>
+                <li><a href="#how">How It Works</a></li>
+                <li><a href="#programs">Features</a></li>
+                <li><a href="#involved">Pricing</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+            <a href="https://assistatrade.gumroad.com/l/purchase" class="btn-get-started" target="_blank" rel="noopener noreferrer">Start at $69.99/mo</a>
+            <button class="menu-toggle" id="menuToggle">
+                <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="3" y1="12" x2="21" y2="12"></line>
+                    <line x1="3" y1="6" x2="21" y2="6"></line>
+                    <line x1="3" y1="18" x2="21" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero rolling-bg" data-images="assets/hero_market_display.png,assets/hero_trading_floor.png,assets/IMG-1380.jpg">
+        <div class="rolling-slideshow"></div>
+        <div class="rolling-overlay"></div>
+        <div class="hero-content">
+            <div class="hero-logo">
+                <img src="assets/logo_title_white_text.png" alt="Assist-A-Trade logo">
+            </div>
+            <p class="tagline">Innovative, user friendly and fully customisable pop up trading system from $69.99</p>
+            <p class="hero-support">Assist-A-Trade is designed to work with <strong>Interactive Brokers market data API</strong> plus optional <strong>Finviz Elite Gmail alerts</strong>. Depending on your setup and usage, the full stack is typically around <strong>$100/month</strong>. You get a fully customizable, user-friendly workflow centered on <strong>Play / Pass / Shelve / Custom</strong> Tinder-style popups that surface trading opportunities from your own input parameters for rapid assessment and entry.</p>
+            <div class="hero-buttons">
+                <a href="#how" class="btn-primary">Learn How It Works</a>
+                <a href="#programs" class="btn-secondary">Explore Features</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Why Assist-A-Trade Section -->
+    <section id="why" class="split-section">
+        <div class="section-wrap photo-bg-content">
+            <div class="split-grid">
+                <div>
+                    <p class="section-label">Our Vision</p>
+                    <h2 class="section-title">Disciplined Decision-Making at Trading Speed</h2>
+                    <div class="section-description">
+                        <p>Built for active traders who want speed, structure, and control without sacrificing transparency.</p>
+                        <p style="margin-top: 1rem;">Use Tinder-style opportunity popups to accept, pass, shelve, or customize setups in real time without losing context.</p>
+                        <p style="margin-top: 1rem;">Control entries, exits, risk settings, keywords, and broker behavior while staying organized through telemetry, logs, and command views.</p>
+                        <p style="margin-top: 1rem;">Assist-A-Trade is not a one-size-fits-all dashboard. It is a trader-first operating system designed to match how you trade, think, and improve.</p>
+                    </div>
+                </div>
+                <div class="photo-stack">
+                    <div class="photo-placeholder has-image primary">
+                        <img src="assets/dashboard_preview.png" alt="Assist-A-Trade dashboard preview">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How Assist-A-Trade Works Section -->
+    <section id="how" class="band photo-bg-section">
+        <div class="photo-bg" style="background-image: url('assets/workflow_bg.png');"></div>
+        <div class="section-wrap photo-bg-content">
+            <p class="section-label">How It Works</p>
+            <h2 class="section-title">From Opportunity Intake to Review in One Connected Loop</h2>
+            <p class="section-description">Assist-A-Trade combines <strong>Finviz Elite Gmail alerts</strong> (optional), <strong>IBKR scanner flow</strong>, and user-defined filters into one stream. Innovative <strong>Tinder-style pop up windows</strong> apply your alert parameters and present trade opportunities for immediate review, rapid assessment, and fast entry with risk controls already in place.</p>
+
+            <div class="pipeline-flow fade-in" aria-label="Trade execution flowchart">
+                <div class="flow-step">Finviz + Gmail + IBKR Intake</div>
+                <div class="flow-arrow" aria-hidden="true"></div>
+                <div class="flow-step">Filter, Keyword, Direction Routing</div>
+                <div class="flow-arrow" aria-hidden="true"></div>
+                <div class="flow-step">Play / Pass / Shelve / Custom Popup</div>
+                <div class="flow-arrow" aria-hidden="true"></div>
+                <div class="flow-step">Sizing, Stops, Max-Position Checks</div>
+                <div class="flow-arrow" aria-hidden="true"></div>
+                <div class="flow-step">IBKR Order Handling + Management</div>
+                <div class="flow-arrow" aria-hidden="true"></div>
+                <div class="flow-step">Performance Hub + Journal + Tax Export</div>
+            </div>
+
+            <div class="solutions-grid fade-in">
+                <div class="solution-card">
+                    <div class="solution-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="2" y1="12" x2="22" y2="12"></line>
+                            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                        </svg>
+                    </div>
+                    <h3>Live Intelligence Intake</h3>
+                    <p>Ingest alerts from Finviz and Gmail plus IBKR scanner flow in one command stream, with contextual headlines and sentiment confidence.</p>
+                    <p>Stay aware of catalysts without juggling disconnected tools.</p>
+                </div>
+                <div class="solution-card">
+                    <div class="solution-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                        </svg>
+                    </div>
+                    <h3>Noise Reduction Controls</h3>
+                    <p>Tune scanner rules, timing windows, direction modes, keyword routing, and strategy filters so low-quality setups are screened out early.</p>
+                    <p>Fewer distractions, more high-conviction opportunities.</p>
+                </div>
+                <div class="solution-card">
+                    <div class="solution-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                            <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                            <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                        </svg>
+                    </div>
+                    <h3>Practical Risk Framework</h3>
+                    <p>Execution is backed by configurable sizing, stop/trail logic, max-position controls, and broker-connected handling through IBKR.</p>
+                    <p>Built for responsible trade management, with monitoring and hierarchical exit logic designed to protect winners from turning into losers.</p>
+                </div>
+                <div class="solution-card">
+                    <div class="solution-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"></path>
+                            <path d="M18 14h-8"></path><path d="M15 18h-5"></path><path d="M10 6h8v4h-8V6Z"></path>
+                        </svg>
+                    </div>
+                    <h3>Close the Loop With Review</h3>
+                    <p>Track equity, drawdown, win rate, expectancy, and directional performance in the Performance Hub, then capture notes, tags, and behavior in the Journal.</p>
+                    <p>When admin time comes, built-in tax reporting converts activity into clean, exportable records.</p>
+                </div>
+                <div class="solution-card">
+                    <div class="solution-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M3 6h18"></path>
+                            <path d="M7 12h10"></path>
+                            <path d="M10 18h4"></path>
+                        </svg>
+                    </div>
+                    <h3>Position Management in Real Time</h3>
+                    <p>Manage open trades with fast add/reduce controls, tighter stop updates, and manual overrides when conditions change quickly.</p>
+                    <p>Designed to keep execution responsive without losing your risk structure.</p>
+                </div>
+                <div class="solution-card">
+                    <div class="solution-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M4 5h16v14H4z"></path>
+                            <path d="M8 3v4"></path>
+                            <path d="M16 3v4"></path>
+                            <path d="M4 11h16"></path>
+                        </svg>
+                    </div>
+                    <h3>Watchlist Triggers and Hotkeys</h3>
+                    <p>Use watchlist rules, trigger alerts, and long/short hotkey controls to route attention toward setups that match your plan.</p>
+                    <p>Keep decision speed high while reducing noise and context-switching.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Programs Section -->
+    <section id="programs" class="band photo-bg-section">
+        <div class="photo-bg" style="background-image: url('assets/signal.jpeg');"></div>
+        <div class="section-wrap photo-bg-content">
+            <p class="section-label">Features</p>
+            <h2 class="section-title">Core Capabilities, End to End</h2>
+            <p class="section-description">Everything below is configurable and designed to sell as a complete execution workspace at <strong>$69.99/month</strong>.</p>
+            <div class="section-description" style="margin-top: 1rem;">
+                <p><strong>Features include:</strong></p>
+                <ul style="margin: 0.75rem 0 0 1.25rem;">
+                    <li>Assist-A-Trade platform license: $69.99/month</li>
+                    <li>Typical total stack near $100/month with IBKR market data and optional Finviz Elite</li>
+                    <li>End-to-end trading workflow in one desktop app</li>
+                    <li>Performance Hub plots: equity, drawdown, win rate, expectancy</li>
+                    <li>Trade journal with notes, tags, and historical review</li>
+                    <li>Live news feed with sentiment score and confidence indicators</li>
+                    <li>Risk engine with max positions, stops, trailing logic, adaptive sizing</li>
+                    <li>Fast Play / Pass / Shelve / Custom trade decision popups</li>
+                    <li>Position management tools: add/reduce, tighten stops, manual actions</li>
+                    <li>Noise reduction filters: scanner, time, keyword, and direction controls</li>
+                    <li>Long and short decision controls with hotkeys</li>
+                    <li>Configurable chart timeframes and indicator settings</li>
+                    <li>Live IBKR charting inside alerts (candles, MA, RSI, MACD, Donchian)</li>
+                    <li>Finviz + Gmail ingestion plus IBKR scanner integration</li>
+                    <li>Watchlist rules with trigger alerts</li>
+                    <li>Command center, logs, and runtime metrics/telemetry views</li>
+                </ul>
+            </div>
+
+            <div class="programs-grid fade-in">
+            <div class="program-card">
+                <div class="program-media media-placeholder image">
+                    <img src="assets/hero_market_display.png" alt="Trading command center visualization">
+                </div>
+                <div class="program-content">
+                    <span class="program-tag">Command &amp; Decision Layer</span>
+                    <h3>Desktop Trading Command Center</h3>
+                    <p>End-to-end workflow in one desktop app with fast Play/Pass/Shelve/Custom popups, watchlist triggers, logs, and runtime telemetry.</p>
+                    <p>Includes configurable chart timeframes, indicators, long/short controls, and hotkeys for rapid action.</p>
+                </div>
+            </div>
+            <div class="program-card">
+                <!-- IMAGE PLACEHOLDER -->
+                <div class="program-media media-placeholder image">
+                    <img src="assets/broker_execution.png" alt="Broker execution visualization">
+                </div>
+                <div class="program-content">
+                    <span class="program-tag">Market Intelligence Layer</span>
+                    <h3>Live News Feed</h3>
+                    <p>Track live headlines with sentiment score and confidence indicators directly in your workflow as setups appear.</p>
+                    <p>Stay aware of catalysts without leaving the command center or breaking decision flow.</p>
+                </div>
+            </div>
+
+            <div class="program-card">
+                <!-- IMAGE PLACEHOLDER -->
+                <div class="program-media media-placeholder image">
+                    <img src="assets/analytics_view.png" alt="Performance analytics view">
+                </div>
+                <div class="program-content">
+                    <span class="program-tag">Review &amp; Intelligence Layer</span>
+                    <h3>Performance Hub &amp; Journal</h3>
+                    <p>Visualize equity, drawdown, win rate, expectancy, and directional results while journaling notes/tags for behavioral review and edge refinement.</p>
+                    <p>Use detailed review metrics and clean exportable records for faster post-trade analysis and admin workflows.</p>
+                </div>
+            </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Get Involved Section -->
+    <section id="involved" class="band photo-bg-section">
+        <div class="photo-bg" style="background-image: url('assets/signal.jpeg');"></div>
+        <div class="section-wrap">
+            <p class="section-label">Pricing</p>
+            <h2 class="section-title">Simple Pricing, Professional Workflow</h2>
+            <p class="section-description">Assist-A-Trade software is <strong>$69.99/month</strong>. Connect it to IBKR market data API and optionally Finviz Elite Gmail alerts to run a fast, intuitive, and risk-controlled process in one place.</p>
+            <p class="section-description" style="margin-top: 1rem;">For many users, total monthly tooling cost is around <strong>$100/month</strong>, depending on account configuration, scanner usage, and whether Finviz alerts are enabled or IBKR scanner-only mode is used.</p>
+
+            <div class="involvement-grid fade-in">
+            <div class="involvement-card">
+                <h3>Rapid Opportunity Assessment</h3>
+                <p>Tinder-style popups turn your alert rules into immediate decisions so you can assess and enter quickly.</p>
+            </div>
+            <div class="involvement-card">
+                <h3>User-Configured Inputs</h3>
+                <p>Scanner criteria, keywords, timing windows, and direction settings are fully customizable to your strategy.</p>
+            </div>
+            <div class="involvement-card">
+                <h3>Risk-Controlled Execution</h3>
+                <p>Monitoring functions plus hierarchical exit assessment are designed to keep profitable trades protected.</p>
+            </div>
+            <div class="involvement-card">
+                <h3>Flexible Data Sources</h3>
+                <p>Use Finviz Elite Gmail alerts, IBKR scanner flow, or both, based on how you trade and what you want to spend.</p>
+            </div>
+            </div>
+
+            <p class="section-description" style="margin-top: 2rem;">Interactive Brokers account and market data API bundle are required. Finviz Elite is optional but recommended for richer signal intake.</p>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section id="cta" class="band photo-bg-section">
+        <div class="photo-bg" style="background-image: url('assets/raised.jpg');"></div>
+        <div class="section-wrap photo-bg-content">
+            <div class="cta-content fade-in">
+                <h2>Put Assist-A-Trade to Work</h2>
+                <p>Start at <strong>$69.99/month</strong> and run a full decision-to-review workflow: alert intake, Tinder-style opportunity popups, risk-managed execution, live monitoring, and structured post-trade analytics.</p>
+            <div class="cta-buttons">
+                <a href="https://assistatrade.gumroad.com/l/purchase" class="btn-primary" target="_blank" rel="noopener noreferrer">Subscribe - $69.99/mo</a>
+                <a href="#contact" class="btn-secondary">Talk to Us</a>
+                <a href="#how" class="btn-secondary">View Workflow</a>
+            </div>
+            <p style="margin-top: 1.25rem; font-size: 0.92rem; color: var(--text-secondary);">Risk disclosure: Capital is at risk. Assist-A-Trade is a user-configured software tool and does not guarantee profits. You are fully responsible for your strategy settings, trade decisions, and outcomes.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="split-section">
+        <div class="contact-container section-wrap">
+            <p class="section-label">Get in Touch</p>
+            <h2 class="section-title">Contact Us</h2>
+            <p class="section-description">Have questions about setup, IBKR requirements, or workflow fit? Reach out directly.</p>
+
+            <div class="contact-grid fade-in">
+                <div class="contact-info">
+                    <h3>Connect With Us</h3>
+
+                    <div class="contact-item">
+                        <div class="contact-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                                <polyline points="22,6 12,13 2,6"></polyline>
+                            </svg>
+                        </div>
+                        <div>
+                            <p><strong>Email</strong></p>
+                            <p><a href="mailto:assistatrade@gmail.com">assistatrade@gmail.com</a></p>
+                        </div>
+                    </div>
+
+                    <div class="contact-item">
+                        <div class="contact-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M22 10.5V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v12c0 1.1.9 2 2 2h12.5"></path>
+                                <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <p><strong>Instagram</strong></p>
+                            <p>assist.a.trade</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-brand">
+                <div class="footer-logo">
+                    <img src="assets/logo_title.png" alt="Assist-A-Trade logo">
+                </div>
+                <p>Assist-A-Trade is a highly customizable trading execution workspace priced at <strong>$69.99/month</strong> and built for active traders who want speed, structure, and control.</p>
+                <p style="margin-top: 1rem;">With IBKR market data API and optional Finviz Elite alerts, most users can run the full stack around $100/month.</p>
+            </div>
+
+            <div class="footer-section">
+                <h4>Navigation</h4>
+                <ul>
+                    <li><a href="#why">Why Assist-A-Trade</a></li>
+                    <li><a href="#how">How It Works</a></li>
+                    <li><a href="#programs">Features</a></li>
+                    <li><a href="#involved">Pricing</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-section">
+                <h4>Resources</h4>
+                <ul>
+                    <li><a href="#how">Trading Workflow</a></li>
+                    <li><a href="#programs">Desktop App</a></li>
+                    <li><a href="#contact">Support</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-section">
+                <h4>Legal</h4>
+                <ul>
+                    <li><a href="#" onclick="alert('Privacy Policy: Assist-A-Trade respects your privacy. Contact us for the full policy.'); return false;">Privacy Policy</a></li>
+                    <li><a href="#" onclick="alert('Terms of Service: Assist-A-Trade is a user-defined software tool. You are responsible for your configuration and all trading decisions. Contact us for full terms.'); return false;">Terms of Service</a></li>
+                    <li><a href="#" onclick="alert('Disclaimer: Capital is at risk. Assist-A-Trade does not provide financial advice and is not liable for trading losses resulting from user-defined settings, strategy choices, or market conditions.'); return false;">Disclaimer</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <p>&copy; 2026 Assist-A-Trade. Built by Owen McCluskey. All rights reserved.</p>
+            <div class="social-links">
+                <a href="mailto:assistatrade@gmail.com" class="social-link">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                        <polyline points="22,6 12,13 2,6"></polyline>
+                    </svg>
+                </a>
+                <a href="#contact" class="social-link">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
+                    </svg>
+                </a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Mobile menu toggle
+        const menuToggle = document.getElementById('menuToggle');
+        const navLinks = document.getElementById('navLinks');
+
+        menuToggle.addEventListener('click', () => {
+            navLinks.classList.toggle('active');
+        });
+
+        document.querySelectorAll('.nav-links a').forEach(link => {
+            link.addEventListener('click', () => {
+                navLinks.classList.remove('active');
+            });
+        });
+
+        // Smooth scrolling
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    const offset = 80;
+                    const targetPosition = target.offsetTop - offset;
+                    window.scrollTo({
+                        top: targetPosition,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+
+        // Scroll animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.fade-in').forEach(el => {
+            observer.observe(el);
+        });
+
+        // Rolling image backgrounds for hero and alternating sections
+        document.querySelectorAll('.rolling-bg').forEach((section) => {
+            const slideshow = section.querySelector('.rolling-slideshow');
+            if (!slideshow) {
+                return;
+            }
+            const images = (section.dataset.images || '').split(',').map(img => img.trim()).filter(Boolean);
+            if (images.length === 0) {
+                return;
+            }
+            images.forEach((img, index) => {
+                const slide = document.createElement('div');
+                slide.className = 'slide' + (index === 0 ? ' active' : '');
+                slide.style.backgroundImage = `url('${img}')`;
+                slideshow.appendChild(slide);
+            });
+
+            let current = 0;
+            const slides = slideshow.querySelectorAll('.slide');
+            const intervalMs = 6000;
+            setInterval(() => {
+                slides[current].classList.remove('active');
+                current = (current + 1) % slides.length;
+                slides[current].classList.add('active');
+            }, intervalMs);
+        });
+
+    </script>
+</body>
+</html>
